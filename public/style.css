@@ -1,0 +1,25 @@
+body{
+	margin: 0;
+}
+
+svg{
+	position: absolute;
+	top:0;
+	left:0;
+}
+
+
+.overlay{
+	z-index: 2
+}
+
+
+
+circle{
+	transition: all 0.3s;
+}
+
+
+circle.dot{
+	transition: all 10s;
+}
