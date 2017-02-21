@@ -1,17 +1,35 @@
 const Scanner = require("ble-scanner");
-
+const ProcessBeacon = require("./lib/ProcessBeacon.js");
+// Bluetooth device name
 const device = "hci0";
 
-var callback = (packet) => {
+const startDate = Date.now();
+/**
+ * Given a packet from an iBeacon, determine the RSSI reading
+ *
+ * @param array 	packet
+ *
+ * @return int
+**/
+const rssiCalc = function(packet) {
+	let p13 = parseInt(packet[13], 16)
+	let rssi = parseInt(packet[14 + p13], 16);
+	// Return a signed version of the rssi
+	return (rssi & 0x80) ? -(0x100 - rssi) : rssi;
+}
 
+/**
+ * Callback for the Scanner function, generate beacon objects and send these
+ * to be processed
+ *
+ * @param array 	Packet 	The packet data from the iBeacon
+ *
+**/
+const callback = (packet) => {
 	try {
-
 		if (packet.length === 45) {
-
 			var rssi = rssiCalc(packet);
-
 			packet = Buffer.from(packet.join(""), "hex");
-
 			var beacon = {
 				uuid: packet.slice(23, 39).toString('hex'),
 				major: packet.readUInt16BE(39),
@@ -19,27 +37,13 @@ var callback = (packet) => {
 				power: packet.readInt8(43),
 				rssi: rssi
 			}
-
-			console.log(beacon);
-
+			ProcessBeacon.addBeacon(beacon);
+			console.log(ProcessBeacon.getProcessedBeacons());
 		}
-
-
 	} catch (err) {
-
 		console.log(err);
-
 	}
-
-
 }
 
-
+// Initialise scan
 var bleScanner = new Scanner(device, callback);
-
-
-const rssiCalc = function(packet) {
-	let p13 = parseInt(packet[13], 16)
-	let rssi = parseInt(packet[14 + p13], 16);
-	return (rssi & 0x80) ? -(0x100 - rssi) : rssi;
-}
