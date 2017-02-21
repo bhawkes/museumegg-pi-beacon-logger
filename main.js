@@ -1,5 +1,7 @@
 const Scanner = require("ble-scanner");
+const CsvWriter = require('csv-write-stream');
 const ProcessBeacon = require("./lib/ProcessBeacon.js");
+
 // Bluetooth device name
 const device = "hci0";
 
@@ -38,12 +40,19 @@ const callback = (packet) => {
 				rssi: rssi
 			}
 			ProcessBeacon.addBeacon(beacon);
-			console.log(ProcessBeacon.getProcessedBeacons());
 		}
 	} catch (err) {
-		console.log(err);
+		console.error(err);
 	}
 }
-
 // Initialise scan
+
+var x = setTimeout(function (beacon) {
+	bleScanner.destroy();
+	var writer = csvWriter();
+	writer.pipe(fs.createWriteStream('./out.csv'));
+	ProcessBeacon.getProcessedBeacons.forEach(item => writer.write(item));
+	writer.end();
+}, 30000);
+
 var bleScanner = new Scanner(device, callback);

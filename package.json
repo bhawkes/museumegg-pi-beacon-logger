@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-	  "ble-scanner":"*"
+    "ble-scanner": "*",
+    "csv-write-stream": "^2.0.0"
   }
 }
