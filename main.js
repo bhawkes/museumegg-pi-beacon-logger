@@ -1,11 +1,14 @@
+process.env.UUID = "2cd0879d64c80a451cf39ecfdd55dee9";
+
 const Scanner = require("ble-scanner");
 const CsvWriter = require('csv-write-stream');
 const ProcessBeacon = require("./lib/ProcessBeacon.js");
 const fs = require('fs');
+const exec = require('child_process').exec();
 // Bluetooth device name
 const device = "hci0";
 
-const startDate = Date.now();
+const start = Date.now();
 /**
  * Given a packet from an iBeacon, determine the RSSI reading
  *
@@ -50,9 +53,12 @@ const callback = (packet) => {
 var x = setTimeout(function (beacon) {
 	bleScanner.destroy();
 	var writer = CsvWriter();
-	writer.pipe(fs.createWriteStream('./out.csv'));
+	writer.pipe(fs.createWriteStream(`${start}.csv`));
 	ProcessBeacon.getProcessedBeacons().forEach(item => writer.write(item));
 	writer.end();
-}, 10000);
+	exec(`obexftp -b A0:99:9B:07:D4:60 -p ${start}.csv`, function(err, stdout, stderr) {
+		console.log(arguments);
+	});
+}, 60000);
 
 var bleScanner = new Scanner(device, callback);
