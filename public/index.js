@@ -5,7 +5,8 @@ var Circle = lateration.Circle;
 var Vector = lateration.Vector;
 var laterate = lateration.laterate;
 
-var socket = io.connect("192.168.5.120:8081");
+//var socket = io.connect("192.168.5.120:8081");
+var socket = io.connect();
 
 var vm = new Vue({
 	el: '#app',

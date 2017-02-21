@@ -1,87 +1,45 @@
-const express = require('express');
-const app = express();
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
-const noble = require('noble');
+const Scanner = require("ble-scanner");
 
-app.set('view engine', 'pug');
-app.use(express.static('public'));
+const device = "hci0";
 
-server.listen(8081);
+var callback = (packet) => {
 
-app.get('/', function(req, res) {
-	res.render('index');
-});
+	try {
 
+		if (packet.length === 45) {
 
-var beacons = {
-	"2cd0879d64c80a451cf39ecfdd55dee9-28925-47754": {
-		uuid: "2cd0879d64c80a451cf39ecfdd55dee9",
-		name: "ice",
-		major: 28925,
-		minor: 47754,
-		measuredPower: false,
-		rssi: false,
-		accuracy: 0,
-		proximity: false
-	},
-	"2cd0879d64c80a451cf39ecfdd55dee9-35635-47204": {
-		uuid: "2cd0879d64c80a451cf39ecfdd55dee9",
-		name: "mint",
-		major: 35635,
-		minor: 47204,
-		measuredPower: false,
-		rssi: false,
-		accuracy: 0,
-		proximity: false
-	},
-	"2cd0879d64c80a451cf39ecfdd55dee9-4681-49931": {
-		uuid: "2cd0879d64c80a451cf39ecfdd55dee9",
-		name: "blueberry",
-		major: 4681,
-		minor: 49931,
-		measuredPower: false,
-		rssi: false,
-		accuracy: 0,
-		proximity: false
-	}
-};
+			var rssi = rssiCalc(packet);
 
-noble.on('stateChange', (state) => {
-	if (state === "poweredOn") {
-		noble.startScanning([], true);
+			packet = Buffer.from(packet.join(""), "hex");
 
-		noble.on('discover', (peripheral) => {
-
-			if ((((peripheral || {}).advertisement || {}).manufacturerData || "").length === 25) {
-
-				var beaconData = peripheral.advertisement.manufacturerData;
-
-				var beacon = {
-					uuid: beaconData.slice(4, 20).toString('hex'),
-					major: beaconData.readUInt16BE(20),
-					minor: beaconData.readUInt16BE(22),
-					power: beaconData.readInt8(24),
-					rssi: peripheral.rssi
-				}
-
-
-
-				if (beacons[`${beacon.uuid}-${beacon.major}-${beacon.minor}`]) {
-
-					var name = beacons[`${beacon.uuid}-${beacon.major}-${beacon.minor}`].name
-
-					console.log(`${beacon.uuid}-${beacon.major}-${beacon.minor} (${name})`, beacon.power, beacon.rssi);
-				} else {
-					console.log(`${beacon.uuid}-${beacon.major}-${beacon.minor} (not known)`, beacon.power, beacon.rssi);
-				}
-
-
-				io.sockets.emit("discovery", beacon);
-
-
+			var beacon = {
+				uuid: packet.slice(23, 39).toString('hex'),
+				major: packet.readUInt16BE(39),
+				minor: packet.readUInt16BE(41),
+				power: packet.readInt8(43),
+				rssi: rssi
 			}
-		});
+
+			console.log(beacon);
+
+		}
+
+
+	} catch (err) {
+
+		console.log(err);
+
 	}
 
-});
+
+}
+
+
+var bleScanner = new Scanner(device, callback);
+
+
+const rssiCalc = function(packet) {
+	let p13 = parseInt(packet[13], 16)
+	let rssi = parseInt(packet[14 + p13], 16);
+	return (rssi & 0x80) ? -(0x100 - rssi) : rssi;
+}

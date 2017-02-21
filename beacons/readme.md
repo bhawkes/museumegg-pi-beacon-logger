@@ -1,0 +1,27 @@
+# hex files for microbit beacons
+
+UUID = 2cd0879d64c80a451cf39ecfdd55dee9
+
+## 1
+MAJOR= 51496
+MINOR= 6493
+
+## 2
+MAJOR= 45502
+MINOR= 651
+
+## 3
+MAJOR= 16690
+MINOR= 64093
+
+## 4
+MAJOR= 49393
+MINOR= 41628
+
+## 5
+MAJOR= 25571
+MINOR= 44527
+
+## 6
+MAJOR= 49245
+MINOR= 8103
