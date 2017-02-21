@@ -49,10 +49,10 @@ const callback = (packet) => {
 
 var x = setTimeout(function (beacon) {
 	bleScanner.destroy();
-	var writer = csvWriter();
+	var writer = CsvWriter();
 	writer.pipe(fs.createWriteStream('./out.csv'));
 	ProcessBeacon.getProcessedBeacons.forEach(item => writer.write(item));
 	writer.end();
-}, 30000);
+}, 10000);
 
 var bleScanner = new Scanner(device, callback);
