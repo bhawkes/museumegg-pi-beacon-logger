@@ -4,7 +4,7 @@ const Scanner = require("ble-scanner");
 const CsvWriter = require('csv-write-stream');
 const ProcessBeacon = require("./lib/ProcessBeacon.js");
 const fs = require('fs');
-const exec = require('child_process').exec();
+const exec = require('child_process').exec;
 // Bluetooth device name
 const device = "hci0";
 
