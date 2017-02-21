@@ -51,7 +51,7 @@ var x = setTimeout(function (beacon) {
 	bleScanner.destroy();
 	var writer = CsvWriter();
 	writer.pipe(fs.createWriteStream('./out.csv'));
-	ProcessBeacon.getProcessedBeacons.forEach(item => writer.write(item));
+	ProcessBeacon.getProcessedBeacons().forEach(item => writer.write(item));
 	writer.end();
 }, 10000);
 
