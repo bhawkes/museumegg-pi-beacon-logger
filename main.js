@@ -53,10 +53,10 @@ const callback = (packet) => {
 var x = setTimeout(function (beacon) {
 	bleScanner.destroy();
 	var writer = CsvWriter();
-	writer.pipe(fs.createWriteStream(`${start}.csv`));
+	writer.pipe(fs.createWriteStream(`./tmp/${start}.csv`));
 	ProcessBeacon.getProcessedBeacons().forEach(item => writer.write(item));
 	writer.end();
-	exec(`obexftp -b A0:99:9B:07:D4:60 -p ${start}.csv`, function(err, stdout, stderr) {
+	exec(`obexftp -b A0:99:9B:07:D4:60 -p ./tmp/${start}.csv`, function(err, stdout, stderr) {
 		console.log(arguments);
 	});
 }, 60000);
