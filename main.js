@@ -5,6 +5,11 @@ const CsvWriter = require('csv-write-stream');
 const ProcessBeacon = require("./lib/ProcessBeacon.js");
 const fs = require('fs');
 const exec = require('child_process').exec;
+
+var gpio = require('rpi-gpio');
+
+var ledState = false;
+
 // Bluetooth device name
 const device = "hci0";
 
@@ -19,13 +24,13 @@ var docking = false;
 const startBeacon = {
 	// ice
 	hash: "749e340821f18928138894c23ff6d3de-28925-47754",
-	rssiTrigger: -50
+	rssiTrigger: -65
 }
 
 const finishBeacon = {
 	// blueberry
 	hash: "749e340821f18928138894c23ff6d3de-4681-49931",
-	rssiTrigger: -50
+	rssiTrigger: -65
 }
 
 
@@ -127,5 +132,24 @@ const finishScanning = () => {
 	});
 }
 
+
+
+gpio.setup(7, gpio.DIR_OUT, function() {
+	setInterval(function() {
+		if (logging) {
+			gpio.write(7, true);
+		} else if (docking) {
+			ledState = !ledState;
+			gpio.write(7, !ledState);
+		} else {
+			gpio.write(7, false);
+		}
+
+	}, 500);
+});
+
+function write() {
+	gpio.write(7, true);
+}
 
 startScanning();
